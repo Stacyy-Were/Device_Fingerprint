@@ -571,3 +571,56 @@ curl http://<host-ip>:5000/health
 Python, Flask, SQLite, JavaScript, HTML, CSS, Linux and Virtual Machine Manager.
 
 The similarity score is based on manually selected signals and doesn't prove that two sessions came from the same physical device XD
+
+## Setup
+
+### Requirements
+
+* Python 3
+* Git
+* Modern web browser
+
+### Install
+
+```bash
+git clone https://github.com/Stacyy-Were/Device_Fingerprint.git
+cd Device_Fingerprint
+
+python3 -m venv venv
+source venv/bin/activate
+
+pip install -r requirements.txt
+```
+
+### Run
+
+```bash
+python app.py
+```
+
+Open:
+
+```text
+http://127.0.0.1:5000
+```
+
+### Network Testing
+
+To test from another machine or VM, make sure Flask uses:
+
+```python
+app.run(host="0.0.0.0", port=5000, debug=True)
+```
+
+Find the host IP:
+
+```bash
+ip route get 1.1.1.1
+```
+
+Then access:
+
+```text
+http://host_IP:5000
+```
+
