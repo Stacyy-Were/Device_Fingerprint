@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Fingerprint Lab</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #000000;
+            color: #d6d6d6;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+        }
+
+        .container {
+            width: 92%;
+            max-width: 1100px;
+            margin: 35px auto;
+        }
+
+        header {
+            border-bottom: 1px solid #092328;
+            padding-bottom: 18px;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            margin: 0 0 6px 0;
+            font-size: 24px;
+            font-weight: 800;
+            color: #e83636;
+        }
+
+        .subtitle {
+            margin: 0;
+            color: aliceblue;
+            font-size: 13px;
+        }
+
+        .section {
+            background: #181818;
+            border: 1px solid #000000;
+            margin-bottom: 18px;
+        }
+
+        .section-header {
+            padding: 12px 15px;
+            border-bottom: 1px solid #303030;
+            background: #412929;
+        }
+
+        .section-header h2 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 500;
+            color: #dddddd;
+        }
+
+        .section-body {
+            padding: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #999999;
+            font-size: 12px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            height: 36px;
+            padding: 7px 9px;
+            background: #101010;
+            border: 1px solid #383838;
+            color: #dddddd;
+            border-radius: 2px;
+            outline: none;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #666666;
+        }
+
+        button {
+            height: 36px;
+            padding: 0 16px;
+            background: #292929;
+            border: 1px solid #444444;
+            color: #dddddd;
+            border-radius: 2px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        button:hover {
+            background: #333333;
+        }
+
+        .capture-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            align-items: end;
+        }
+
+        .network-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            border: 1px solid #303030;
+        }
+
+        .network-item {
+            padding: 12px;
+            border-right: 1px solid #303030;
+        }
+
+        .network-item:last-child {
+            border-right: none;
+        }
+
+        .network-label {
+            color: #777777;
+            font-size: 11px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .network-value {
+            color: #cccccc;
+            font-family: monospace;
+            font-size: 12px;
+            word-break: break-all;
+        }
+
+        pre {
+            margin: 0;
+            padding: 14px;
+            background: #0d0d0d;
+            border: 1px solid #303030;
+            color: #bdbdbd;
+            font-family: monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .fingerprint {
+            color: #aaa;
+        }
+
+        .compare-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 10px;
+            align-items: end;
+        }
+
+        .capture-list {
+            border: 1px solid #303030;
+        }
+
+        .capture {
+            display: grid;
+            grid-template-columns: 55px 1fr 1fr;
+            gap: 10px;
+            padding: 11px 12px;
+            border-bottom: 1px solid #292929;
+            background: #151515;
+        }
+
+        .capture:last-child {
+            border-bottom: none;
+        }
+
+        .capture-id {
+            color: #777777;
+            font-family: monospace;
+        }
+
+        .capture-name {
+            color: #cccccc;
+        }
+
+        .capture-ip {
+            color: #777777;
+            font-family: monospace;
+            text-align: right;
+        }
+
+        .empty {
+            padding: 14px;
+            color: #666666;
+        }
+
+        .status {
+            margin-top: 10px;
+            color: #777777;
+            font-size: 12px;
+        }
+
+        #result {
+            display: none;
+        }
+
+        .result-summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            border: 1px solid #303030;
+            margin-bottom: 18px;
+        }
+
+        .result-box {
+            padding: 16px;
+            border-right: 1px solid #303030;
+            text-align: center;
+        }
+
+        .result-box:last-child {
+            border-right: none;
+        }
+
+        .result-label {
+            color: #777777;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .result-value {
+            color: #dddddd;
+            font-size: 24px;
+            font-family: monospace;
+        }
+
+        .assessment {
+            margin-bottom: 18px;
+            padding: 10px 12px;
+            background: #151515;
+            border: 1px solid #303030;
+        }
+
+        .assessment strong {
+            color: #dddddd;
+        }
+
+        .comparison {
+            margin-top: 18px;
+        }
+
+        .comparison h3 {
+            font-size: 12px;
+            font-weight: normal;
+            color: #888888;
+            margin: 0 0 7px 0;
+            text-transform: uppercase;
+        }
+
+        .note {
+            margin: 18px 0 0 0;
+            padding-top: 14px;
+            border-top: 1px solid #292929;
+            color: #666666;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 700px) {
+            .container {
+                width: 95%;
+                margin-top: 20px;
+            }
+
+            .capture-row,
+            .compare-row {
+                grid-template-columns: 1fr;
+            }
+
+            .network-grid,
+            .result-summary {
+                grid-template-columns: 1fr;
+            }
+
+            .network-item,
+            .result-box {
+                border-right: none;
+                border-bottom: 1px solid #303030;
+            }
+
+            .network-item:last-child,
+            .result-box:last-child {
+                border-bottom: none;
+            }
+
+            .capture {
+                grid-template-columns: 45px 1fr;
+            }
+
+            .capture-ip {
+                grid-column: 2;
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <header>
+        <h1>Device Fingerprint Lab</h1>
+        <p class="subtitle">
+            Browser, device and network correlation research
+        </p>
+    </header>
+
+    <div class="section">
+        <div class="section-header">
+            <h2>Capture Fingerprint</h2>
+        </div>
+
+        <div class="section-body">
+
+            <div class="capture-row">
+
+                <div>
+                    <label for="label">
+                        Label
+                    </label>
+
+                    <input
+                        id="label"
+                        type="text"
+                        placeholder="Eg. Ubuntu Firefox"
+                    >
+                </div>
+
+                <button onclick="captureFingerprint()">
+                    Capture
+                </button>
+
+            </div>
+
+            <div id="captureStatus" class="status"></div>
+
+        </div>
+    </div>
+
+    <div class="section">
+
+        <div class="section-header">
+            <h2>Network Metadata</h2>
+        </div>
+
+        <div class="section-body">
+
+            <div class="network-grid">
+
+                <div class="network-item">
+                    <div class="network-label">
+                        IP Address
+                    </div>
+
+                    <div
+                        id="ipAddress"
+                        class="network-value"
+                    >
+                        Not captured
+                    </div>
+                </div>
+
+                <div class="network-item">
+                    <div class="network-label">
+                        Forwarded For
+                    </div>
+
+                    <div
+                        id="forwardedFor"
+                        class="network-value"
+                    >
+                        None
+                    </div>
+                </div>
+
+                <div class="network-item">
+                    <div class="network-label">
+                        Scheme
+                    </div>
+
+                    <div
+                        id="scheme"
+                        class="network-value"
+                    >
+                        Not captured
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div class="section">
+
+        <div class="section-header">
+            <h2>Browser Signals</h2>
+        </div>
+
+        <div class="section-body">
+
+            <pre id="signals">Nothing captured yet.</pre>
+
+        </div>
+
+    </div>
+
+    <div class="section">
+
+        <div class="section-header">
+            <h2>Fingerprint Hash</h2>
+        </div>
+
+        <div class="section-body">
+
+            <pre
+                id="fingerprint"
+                class="fingerprint"
+            >Nothing captured yet.</pre>
+
+        </div>
+
+    </div>
+
+    <div class="section">
+
+        <div class="section-header">
+            <h2>Compare Captures</h2>
+        </div>
+
+        <div class="section-body">
+
+            <div class="compare-row">
+
+                <div>
+                    <label for="captureA">
+                        Fingerprint A
+                    </label>
+
+                    <select id="captureA">
+                        <option value="">
+                            Select capture A
+                        </option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="captureB">
+                        Fingerprint B
+                    </label>
+
+                    <select id="captureB">
+                        <option value="">
+                            Select capture B
+                        </option>
+                    </select>
+                </div>
+
+                <button onclick="compareCaptures()">
+                    Compare
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div class="section">
+
+        <div class="section-header">
+            <h2>Saved Captures</h2>
+        </div>
+
+        <div class="section-body">
+
+            <div
+                id="captureList"
+                class="capture-list"
+            >
+                <div class="empty">
+                    No captures yet.
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div
+        id="result"
+        class="section"
+    >
+
+        <div class="section-header">
+            <h2>Correlation Result</h2>
+        </div>
+
+        <div class="section-body">
+
+            <div class="assessment">
+
+                Assessment:
+                <strong id="assessment">-</strong>
+
+                <span id="confidence">
+                    Confidence: -
+                </span>
+
+            </div>
+
+            <div class="result-summary">
+
+                <div class="result-box">
+
+                    <div class="result-label">
+                        Browser Similarity
+                    </div>
+
+                    <div
+                        id="browserScore"
+                        class="result-value"
+                    >
+                        0%
+                    </div>
+
+                </div>
+
+                <div class="result-box">
+
+                    <div class="result-label">
+                        Network Similarity
+                    </div>
+
+                    <div
+                        id="networkScore"
+                        class="result-value"
+                    >
+                        0%
+                    </div>
+
+                </div>
+
+                <div class="result-box">
+
+                    <div class="result-label">
+                        Overall Correlation
+                    </div>
+
+                    <div
+                        id="overallScore"
+                        class="result-value"
+                    >
+                        0%
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="comparison">
+
+                <h3>
+                    Browser Signal Comparison
+                </h3>
+
+                <pre id="browserComparison"></pre>
+
+            </div>
+
+            <div class="comparison">
+
+                <h3>
+                    Network Comparison
+                </h3>
+
+                <pre id="networkComparison"></pre>
+
+            </div>
+
+            <p class="note">
+                Browser fingerprinting provides probabilistic correlation,
+                not proof of physical device identity. Network identity and
+                browser identity are separate signals.
+            </p>
+
+        </div>
+    </div>
+
+</div>
+
+<script>
+
+async function collectSignals() {
+
+    return {
+        userAgent: navigator.userAgent,
+        language: navigator.language,
+        languages: navigator.languages,
+        platform: navigator.platform,
+        screenWidth: window.screen.width,
+        screenHeight: window.screen.height,
+        colorDepth: window.screen.colorDepth,
+        pixelRatio: window.devicePixelRatio,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        cpuCores: navigator.hardwareConcurrency || null,
+        touchPoints: navigator.maxTouchPoints || 0,
+        cookiesEnabled: navigator.cookieEnabled,
+        doNotTrack: navigator.doNotTrack
+    };
+}
+
+
+async function captureFingerprint() {
+
+    const labelInput =
+        document.getElementById("label");
+
+    const label =
+        labelInput.value.trim() ||
+        "Unnamed capture";
+
+    const signals =
+        await collectSignals();
+
+    document.getElementById("signals").textContent =
+        JSON.stringify(signals, null, 2);
+
+    document.getElementById("captureStatus").textContent =
+        "Sending capture...";
+
+    try {
+
+        const response =
+            await fetch("/fingerprint", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    label: label,
+                    ...signals
+                })
+            });
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.error || "Request failed"
+            );
+        }
+
+        document.getElementById("fingerprint").textContent =
+            data.fingerprint;
+
+        document.getElementById("ipAddress").textContent =
+            data.network.ipAddress || "Unavailable";
+
+        document.getElementById("forwardedFor").textContent =
+            data.network.forwardedFor || "None";
+
+        document.getElementById("scheme").textContent =
+            data.network.scheme || "Unknown";
+
+        document.getElementById("captureStatus").textContent =
+            "Capture saved.";
+
+        labelInput.value = "";
+
+        await loadCaptures();
+
+    } catch (error) {
+
+        document.getElementById("captureStatus").textContent =
+            "Error: " + error.message;
+
+        console.error(error);
+    }
+}
+
+
+async function loadCaptures() {
+
+    try {
+
+        const response =
+            await fetch("/captures");
+
+        const captures =
+            await response.json();
+
+        const selectA =
+            document.getElementById("captureA");
+
+        const selectB =
+            document.getElementById("captureB");
+
+        const captureList =
+            document.getElementById("captureList");
+
+        selectA.innerHTML =
+            '<option value="">Select capture A</option>';
+
+        selectB.innerHTML =
+            '<option value="">Select capture B</option>';
+
+        captureList.innerHTML = "";
+
+        if (!captures.length) {
+
+            captureList.innerHTML =
+                '<div class="empty">No captures yet.</div>';
+
+            return;
+        }
+
+        captures.forEach(capture => {
+
+            const optionA =
+                document.createElement("option");
+
+            optionA.value =
+                capture.id;
+
+            optionA.textContent =
+                `${capture.id} - ${capture.label}`;
+
+            const optionB =
+                optionA.cloneNode(true);
+
+            selectA.appendChild(optionA);
+            selectB.appendChild(optionB);
+
+            const item =
+                document.createElement("div");
+
+            item.className =
+                "capture";
+
+            item.innerHTML = `
+                <div class="capture-id">
+                    #${capture.id}
+                </div>
+
+                <div class="capture-name">
+                    ${escapeHtml(capture.label)}
+                </div>
+
+                <div class="capture-ip">
+                    ${escapeHtml(
+                        capture.network.ipAddress ||
+                        "Unknown"
+                    )}
+                </div>
+            `;
+
+            captureList.appendChild(item);
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Could not load captures:",
+            error
+        );
+    }
+}
+
+
+async function compareCaptures() {
+
+    const idA =
+        document.getElementById("captureA").value;
+
+    const idB =
+        document.getElementById("captureB").value;
+
+    if (!idA || !idB) {
+
+        alert(
+            "Select two captures first."
+        );
+
+        return;
+    }
+
+    if (idA === idB) {
+
+        alert(
+            "Select two different captures."
+        );
+
+        return;
+    }
+
+    try {
+
+        const responseA =
+            await fetch(`/capture/${idA}`);
+
+        const responseB =
+            await fetch(`/capture/${idB}`);
+
+        const captureA =
+            await responseA.json();
+
+        const captureB =
+            await responseB.json();
+
+        const response =
+            await fetch("/compare", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    fingerprint_a: captureA,
+                    fingerprint_b: captureB
+                })
+            });
+
+        const result =
+            await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                result.error || "Comparison failed"
+            );
+        }
+
+        document.getElementById("result").style.display =
+            "block";
+
+        document.getElementById("assessment").textContent =
+            result.assessment;
+
+        document.getElementById("confidence").textContent =
+            " | Confidence: " +
+            result.confidence;
+
+        document.getElementById("browserScore").textContent =
+            result.browser_percentage + "%";
+
+        document.getElementById("networkScore").textContent =
+            result.network_percentage + "%";
+
+        document.getElementById("overallScore").textContent =
+            result.overall_percentage + "%";
+
+        document.getElementById("browserComparison").textContent =
+            JSON.stringify(
+                result.browser_comparison,
+                null,
+                2
+            );
+
+        document.getElementById("networkComparison").textContent =
+            JSON.stringify(
+                result.network_comparison,
+                null,
+                2
+            );
+
+        document.getElementById("result").scrollIntoView({
+            behavior: "smooth"
+        });
+
+    } catch (error) {
+
+        alert(
+            "Comparison failed: " +
+            error.message
+        );
+
+        console.error(error);
+    }
+}
+
+
+function escapeHtml(value) {
+
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+
+loadCaptures();
+
+</script>
+
+</body>
+</html>
